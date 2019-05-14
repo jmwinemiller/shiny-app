@@ -1,6 +1,47 @@
 
+```{r reload-data, include=F}
+full.data = read.csv("~/Documents/Personal/KU/STAT\ 806/presentation/heart.csv", sep = ",", header = TRUE)
+h.full = head(full.data)
+rdf <- full.data %>% 
+  select(1, 2, 4, 5, 8, 9, 3, 14) %>% 
+  rename(resting_bp= "trestbps",
+         cholestoral= "chol",
+         heart_rate= "thalach",
+         exercise_induced_angina= "exang",
+         chest_pain= "cp",
+         heart_disease= "target")
+h.rdf = head(rdf)
+
+rdf %>% 
+  mutate(chest_pain = ifelse(
+    chest_pain == 0,
+    "typical angina",
+    ifelse(
+      chest_pain == 1,
+      "atypical angina",
+      ifelse(
+       chest_pain == 2,
+       "non-anginal pain",
+       ifelse(
+         chest_pain == 3,
+         "asymptomatic",
+         0))))) %>% 
+  mutate(sex = ifelse(sex == 0, "female", "male")) %>% 
+  mutate(exercise_induced_angina = ifelse(exercise_induced_angina == 0, "no", "yes")) %>% 
+  mutate(heart_disease = ifelse(heart_disease == 0, "health", "unhealthy")) %>% 
+  select(age, sex, chest_pain, exercise_induced_angina, resting_bp, heart_rate, cholestoral, heart_disease) -> df
+df$sex <- as.factor(df$sex)
+df$chest_pain <- as.factor(df$chest_pain)
+df$exercise_induced_angina <- as.factor(df$exercise_induced_angina)
+df$heart_disease <- as.factor(df$heart_disease)
+h.df = head(df)
+attach(df)
+```
 
 ```{r visualization}
+library(summarytools)
+library(ggiraph)
+library(cowplot)
 col.id = colnames(df)
 c.name = list()
 cap <- function(x) {
@@ -11,30 +52,32 @@ for (i in col.id) {
   x = sapply(i, cap)[[1]]
   c.name <- append(c.name, x)
 }
+c.type = list()
+df_sum = dfSummary(df)
+for (i in df_sum$Variable) {
+  c.type <- append(c.type, gsub('\\]', '', gsub('\\[','', strsplit(i[1], "\\\n")[[1]][2])))
+}
+cont.var = c('Frequency')
+for (i in 1:length(c.type)) {
+  if (c.type[i][[1]] == 'integer') {
+    cont.var <- append(cont.var, c.name[i])
+  }
+}
+fact.var = c('None', c.name[!(c.name %in% cont.var)])
+
 
 fluidPage(
   titlePanel("Exploratory Visualizations"),
   sidebarLayout(
     sidebarPanel(
       selectInput(inputId = "x",
-                  "Select Variable for X Axis:",
-                  choices = c.name,
+                  "Select Variable:",
+                  choices = c('', c.name),
                   selected = 1),
-      selectInput(inputId = "y",
-                  "Select Variable for Y Axis:",
-                  choices = c.name,
-                  selected = 1),
-      checkboxGroupInput(inputId = "chan",
-                      "Add Channels for Factor Variables:",
-                      choices=c("Sex" = "sex",
-                                "Chest Pain" = "cp",
-                                "Exercise Induced Angina" = "eia",
-                                "Heart Disease" = "hd"
-                                )),
-      selectInput(inputId = "line",
-                  "Add Linear Assocation:",
-                  choices = c("Yes", "No"),
-                  selected = 1),
+      uiOutput("secondSelection"),
+      uiOutput("catSelection"),
+      uiOutput("barSelection"),
+      uiOutput("boxSelection"),
       sliderInput(inputId = "age",
                   "Age Range:",
                   min = min(df$age),
@@ -44,43 +87,114 @@ fluidPage(
     ),
     mainPanel(
       h5(""),
-      ggiraphOutput(outputId = "plot")
+      conditionalPanel(
+        condition = "input.x != ''",
+        ggiraphOutput(outputId = "plot")
+      )
     )
   )
 )
 
+output$secondSelection <- renderUI({
+  var.list = if (input$x == "") "" else (if (input$x %in% cont.var) c.name[c.name != input$x] else cont.var)
+  selectInput('y', "Select Response Variable", choices = var.list)
+})
+
+output$catSelection <- renderUI({
+  conditionalPanel(
+    condition = "['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.x) &&  ['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.y)", 
+  checkboxGroupInput(
+    inputId = "chan",
+    "Add Channels for Factor Variables:",
+    choices=c("Sex" = "sex",
+              "Chest Pain" = "cp",
+              "Heart Disease" = "hd")),
+    selectInput(inputId = "line",
+                "Add Linear Assocation:",
+                choices = c("Yes", "No"),
+                selected = 1)
+  )
+})
+
+output$barSelection <- renderUI({
+  conditionalPanel(
+    condition = "input.y == 'Frequency'",
+    selectInput(inputId = 'port',
+                'Add Proportions for Variable:',
+                choices = fact.var)
+  )
+})
+
+output$boxSelection <- renderUI({
+  conditionalPanel(
+    condition = "(['Sex', 'Resting Bp', 'Heart Rate', 'Exercise Induced Angina', 'Heart Disease'].includes(input.x) && input.y != 'Frequency') || (['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.x) && !['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.y))",
+    selectInput(inputId = 'box',
+                'Add Color for Variable:',
+                choices = fact.var)
+  )
+})
+
 output$plot <- renderggiraph({
   x.axis = match(input$x, c.name)
   x.lab = input$x 
-  y.axis = match(input$y, c.name)
+  y.axis = if (input$y == "Frequency") match("Sex", c.name) else match(input$y, c.name)
   y.lab = input$y
   
-  chan.sex = ifelse("sex" %in% input$chan, df$sex, "") 
-  chan.cp = ifelse("cp" %in% input$chan, df$chest_pain, "") 
-  chan.eia = ifelse("eia" %in% input$chan, df$exercise_induced_angina, "") 
-  chan.hd = ifelse("hd" %in% input$chan, df$heart_disease, "") 
-  label.sex = ifelse("sex" %in% input$chan, df$sex, "") 
-  label.cp = ifelse("cp" %in% input$chan, df$chest_pain, "") 
-  label.eia = ifelse("eia" %in% input$chan, df$exercise_induced_angina, "") 
-  label.hd = ifelse("hd" %in% input$chan, df$heart_disease, "") 
+  age.df = df[df$age >= input$age[1] & df$age <= input$age[2], ]
+  bar.port = if (input$port == "None") "" else age.df[, match(input$port, c.name)]
+  col.box = if (input$box == "None") "" else age.df[, match(input$box, c.name)]
+
   
+  if (c.type[x.axis][[1]] == c.type[y.axis][[1]] & c.type[x.axis][[1]] == 'integer') {
+    plt = ggplot(age.df) + 
+      geom_point_interactive(aes(
+        x = age.df[, x.axis],
+        y = age.df[, y.axis],
+        color = if ("cp" %in% input$chan) factor(age.df$chest_pain) else "",
+        size =  if ("hd" %in% input$chan) factor(age.df$heart_disease) else "",
+        shape = if ("sex" %in% input$chan) factor(age.df$sex) else "")) +
+      labs(x = x.lab,
+           y = y.lab,
+           color = if ("cp" %in% input$chan) "Chest Pain Level" else "Size",
+           size = if ("hd" %in% input$chan) "Heart Disease" else "Fill",
+           shape = if ("sex" %in% input$chan) "Sex" else "Shape") +
+      ggtitle(paste0(x.lab, " vs Response ", y.lab))
   
-   
-  plt = ggplot(df[df$age >= input$age[1] & df$age <= input$age[2], ]) +
-    geom_point_interactive(aes(x = df[, x.axis],
-                               y = df[, y.axis],
-                               size = chan.cp,
-                               fill = chan.sex,
-                               shape = chan.eia
-                               )) + 
-    theme_classic() +
-    ggtitle(paste0(x.lab, " against ", y.lab)) +
-    labs(x = x.lab,
-         y = y.lab)
-    
     if (input$line == "Yes") {
-      plt = plt + geom_smooth(method = "glm", aes(x = df[, x.axis], y = df[, y.axis]))
+      plt = plt + geom_smooth(method = "glm", aes(x = age.df[, x.axis], y = age.df[, y.axis]))
     }    
+  } else if (c.type[x.axis][[1]] == 'factor' & input$y == "Frequency") {
+    plt = ggplot(age.df,
+                 aes(x = age.df[, x.axis],
+                     tooltip = age.df[, x.axis],
+                     data_id = age.df[, x.axis],
+                     fill = bar.port)) +
+                   labs(x = x.lab,
+                        fill = input$port) +
+                   ggtitle(paste0('Bar Chart for ', x.lab, '\n with Optional Porportions\n for Variable ', input$port))
+    plt = plt + geom_bar_interactive()
+  } else if (c.type[x.axis][[1]] != c.type[y.axis][[1]] & c.type[x.axis][[1]] == 'integer') {
+    plt = ggplot(age.df,
+                 aes(x = age.df[, y.axis],
+                     y = age.df[, x.axis])) +
+                 labs(x = y.lab,
+                      y = x.lab) +
+      ggtitle(paste0('Box Plots for ', y.lab, '\n Over Variable ', x.lab, '\n with Color Channel ', input$box))
+    plt = plt + geom_boxplot_interactive(aes(color = col.box)) + labs(color = input$box) 
+  } else {
+    plt = ggplot(age.df,
+                 aes(x = age.df[, x.axis],
+                     y = age.df[, y.axis])) +
+                   labs(x = x.lab,
+                        y = y.lab) + 
+      ggtitle(paste0('Box Plots for ', x.lab, '\n Over Variable ', y.lab, '\n with Color Channel ', input$box))
+    plt = plt + geom_boxplot(aes(color = col.box)) + labs(color = input$box)
+  }
+  
+  plt = plt + theme_classic() 
+  plt = plt + theme(plot.title = element_text(hjust = 0.5)) 
+  
   girafe(code = print(plt))
 })
 ```
+

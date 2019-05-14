@@ -48,18 +48,18 @@ fluidPage(
     p('Changing the factors to non-encoded values for clean dataset.'),
     tabsetPanel(
       tabPanel("Cleaned Dataset", fluidRow(
-        column(12, tableOutput("cds")))),
+        column(12, dataTableOutput("cds")))),
       tabPanel("Reduced Dataset", fluidRow(
-        column(12, tableOutput("rds")))),
+        column(12, dataTableOutput("rds")))),
       tabPanel("Full Dataset", fluidRow(
-        column(12, tableOutput("fds"))))
+        column(12, dataTableOutput("fds"))))
     )
   )
 )
 
-output$cds <- renderTable(h.df)
-output$rds <- renderTable(h.rdf)
-output$fds <- renderTable(h.full)
+output$cds <- renderDataTable(df, options = list(columnDefs = list(list(className = 'dt-center', targets = '_all')))) 
+output$rds <- renderDataTable(rdf, options = list(columnDefs = list(list(className = 'dt-center', targets = '_all')))) 
+output$fds <- renderDataTable(full.data, options = list(columnDefs = list(list(className = 'dt-center', targets = '_all'))))
 ```
 
 
