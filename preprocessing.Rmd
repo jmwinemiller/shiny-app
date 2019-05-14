@@ -1,0 +1,133 @@
+# Exploritory Data Analysis  
+
+```{r load-data}
+full.data = read.csv("./heart.csv", sep = ",", header = TRUE)
+h.full = head(full.data)
+rdf <- full.data %>% 
+  select(1, 2, 4, 5, 8, 9, 3, 14) %>% 
+  rename(resting_bp= "trestbps",
+         cholestoral= "chol",
+         heart_rate= "thalach",
+         exercise_induced_angina= "exang",
+         chest_pain= "cp",
+         heart_disease= "target")
+h.rdf = head(rdf)
+
+rdf %>% 
+  mutate(chest_pain = ifelse(
+    chest_pain == 0,
+    "typical angina",
+    ifelse(
+      chest_pain == 1,
+      "atypical angina",
+      ifelse(
+       chest_pain == 2,
+       "non-anginal pain",
+       ifelse(
+         chest_pain == 3,
+         "asymptomatic",
+         0))))) %>% 
+  mutate(sex = ifelse(sex == 0, "female", "male")) %>% 
+  mutate(exercise_induced_angina = ifelse(exercise_induced_angina == 0, "no", "yes")) %>% 
+  mutate(heart_disease = ifelse(heart_disease == 0, "health", "unhealthy")) %>% 
+  select(age, sex, chest_pain, exercise_induced_angina, resting_bp, heart_rate, cholestoral, heart_disease) -> df
+df$sex <- as.factor(df$sex)
+df$chest_pain <- as.factor(df$chest_pain)
+df$exercise_induced_angina <- as.factor(df$exercise_induced_angina)
+df$heart_disease <- as.factor(df$heart_disease)
+h.df = head(df)
+attach(df)
+```
+
+
+```{r preprocessing-data}
+fluidPage(
+  titlePanel('Pre-processing Data'),
+  mainPanel(
+    h5('Reduced dataset compared to the full dataset.'),
+    p('Changing the factors to non-encoded values for clean dataset.'),
+    tabsetPanel(
+      tabPanel("Cleaned Dataset", fluidRow(
+        column(12, tableOutput("cds")))),
+      tabPanel("Reduced Dataset", fluidRow(
+        column(12, tableOutput("rds")))),
+      tabPanel("Full Dataset", fluidRow(
+        column(12, tableOutput("fds"))))
+    )
+  )
+)
+
+output$cds <- renderTable(h.df)
+output$rds <- renderTable(h.rdf)
+output$fds <- renderTable(h.full)
+```
+
+
+```{r summary-data}
+fluidPage(
+  titlePanel("Summarizing Data"),
+  mainPanel(
+    h5("Creating Summary of data with the summarytools package."),
+    tabsetPanel(
+      tabPanel("Data Frame Summary for Clean Data", htmlOutput("dfsum")),
+      tabPanel("Descriptive Statistics for Clean Data", htmlOutput("des.stat")),
+      tabPanel("Frequencies Statistics for Clean Data", htmlOutput("freq.sum")),
+      tabPanel("Data Frame Summary for Reduced Dataset", htmlOutput("dfsum.rde")),
+      tabPanel("Descriptive Statistics for Reduced Dataset", htmlOutput("des.rde")),
+      tabPanel("Frequencies Statistics for Reduced Dataset", htmlOutput("freq.rde"))
+    )
+  )
+)
+
+output$dfsum <- renderUI({
+  req(print(dfSummary(df), method = 'render'))
+})
+output$des.stat <- renderUI({
+  req(print(descr(df), method = 'render'))
+})
+output$freq.sum <- renderUI({
+  req(print(freq(df), method = 'render'))
+})
+output$dfsum.rde <- renderUI({
+  req(print(dfSummary(rdf), method = 'render'))
+})
+output$des.rde <- renderUI({
+  req(print(descr(rdf), method = 'render'))
+})
+output$freq.rde <- renderUI({
+  req(print(freq(rdf), method = 'render'))
+})
+```
+
+
+```{r cross-tab}
+fluidPage(
+  titlePanel("Examining Proportions"),
+  mainPanel(
+    h5("Using cross-tabular tables to find row proportions of heart disease."),
+    tabsetPanel(
+      tabPanel("Sex", htmlOutput("sct")),
+      tabPanel("Chest Pain", htmlOutput("cpct")), 
+      tabPanel("Exercise Induced Angina", htmlOutput("ect")), 
+      tabPanel("Chest Pain and EIA", htmlOutput("cpect")),
+      tabPanel("All factors", htmlOutput("allct"))
+    )
+  )
+)
+
+output$sct <- renderUI({
+  req(print(with(df, ctable(sex, heart_disease, headings = F, prop = "c")), method = 'render'))
+})
+output$cpct <- renderUI({
+  req(print(with(df, ctable(chest_pain, heart_disease, headings = F, prop = "c")), method = 'render'))
+}) 
+output$ect <- renderUI({
+  req(print(with(df, ctable(exercise_induced_angina, heart_disease, headings = F, prop = "c")), method = 'render'))
+})  
+output$cpect <- renderUI({
+  req(print(with(df, ctable(paste0(chest_pain, " ", exercise_induced_angina), heart_disease, headings = F, prop = "c")), method = 'render'))
+})  
+output$allct <- renderUI({
+  req(print(with(df, ctable(paste0(sex, " ", chest_pain, " ", exercise_induced_angina), heart_disease, headings = F, prop = "c")), method = 'render'))
+})
+```

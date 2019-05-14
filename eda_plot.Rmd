@@ -1,0 +1,86 @@
+
+
+```{r visualization}
+col.id = colnames(df)
+c.name = list()
+cap <- function(x) {
+  s <- strsplit(x, "_")[[1]]
+  paste(toupper(substring(s, 1, 1)), substring(s, 2), sep = "", collapse = " ")
+}
+for (i in col.id) {
+  x = sapply(i, cap)[[1]]
+  c.name <- append(c.name, x)
+}
+
+fluidPage(
+  titlePanel("Exploratory Visualizations"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(inputId = "x",
+                  "Select Variable for X Axis:",
+                  choices = c.name,
+                  selected = 1),
+      selectInput(inputId = "y",
+                  "Select Variable for Y Axis:",
+                  choices = c.name,
+                  selected = 1),
+      checkboxGroupInput(inputId = "chan",
+                      "Add Channels for Factor Variables:",
+                      choices=c("Sex" = "sex",
+                                "Chest Pain" = "cp",
+                                "Exercise Induced Angina" = "eia",
+                                "Heart Disease" = "hd"
+                                )),
+      selectInput(inputId = "line",
+                  "Add Linear Assocation:",
+                  choices = c("Yes", "No"),
+                  selected = 1),
+      sliderInput(inputId = "age",
+                  "Age Range:",
+                  min = min(df$age),
+                  max = max(df$age),
+                  step = 1,
+                  value = c(min(df$age), max(df$age)))
+    ),
+    mainPanel(
+      h5(""),
+      ggiraphOutput(outputId = "plot")
+    )
+  )
+)
+
+output$plot <- renderggiraph({
+  x.axis = match(input$x, c.name)
+  x.lab = input$x 
+  y.axis = match(input$y, c.name)
+  y.lab = input$y
+  
+  chan.sex = ifelse("sex" %in% input$chan, df$sex, "") 
+  chan.cp = ifelse("cp" %in% input$chan, df$chest_pain, "") 
+  chan.eia = ifelse("eia" %in% input$chan, df$exercise_induced_angina, "") 
+  chan.hd = ifelse("hd" %in% input$chan, df$heart_disease, "") 
+  label.sex = ifelse("sex" %in% input$chan, df$sex, "") 
+  label.cp = ifelse("cp" %in% input$chan, df$chest_pain, "") 
+  label.eia = ifelse("eia" %in% input$chan, df$exercise_induced_angina, "") 
+  label.hd = ifelse("hd" %in% input$chan, df$heart_disease, "") 
+  
+  
+   
+  plt = ggplot(df[df$age >= input$age[1] & df$age <= input$age[2], ]) +
+    geom_point_interactive(aes(x = df[, x.axis],
+                               y = df[, y.axis],
+                               size = chan.cp,
+                               fill = chan.sex,
+                               shape = chan.eia
+                               )) + 
+    theme_classic() +
+    ggtitle(paste0(x.lab, " against ", y.lab)) +
+    labs(x = x.lab,
+         y = y.lab)
+    
+    if (input$line == "Yes") {
+      plt = plt + geom_smooth(method = "glm", aes(x = df[, x.axis], y = df[, y.axis]))
+    }    
+  girafe(code = print(plt))
+})
+```
