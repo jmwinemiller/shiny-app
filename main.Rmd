@@ -23,16 +23,16 @@ required_packages = c('remotes', 'shiny', 'ggplot2', 'tidyverse', 'dplyr', 'summ
 remote_packages = c('shinyaudio')
 all_packages = c(required_packages, remote_packages)
 
-# for (package in all_packages) {
-#   if (package %in% ip) {
-#     next
-#   } else {
-#     if (package %in% remote_packages) {
-#       remotes::install_github('mattkcole/shinyaudio')
-#     }
-#     install.packages(package, repos = "http://cran.us.r-project.org")
-#   }
-# }
+for (package in all_packages) {
+  if (package %in% ip) {
+    next
+  } else {
+    if (package %in% remote_packages) {
+      remotes::install_github('mattkcole/shinyaudio')
+    }
+    install.packages(package, repos = "http://cran.us.r-project.org")
+  }
+}
 
 lapply(all_packages, require, character.only = TRUE)
 ```
