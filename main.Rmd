@@ -41,12 +41,12 @@ lapply(all_packages, require, character.only = TRUE)
 # Presentation Overview  
 
 
-```{r}
-#audio()
+```{r audio-intro}
+shinyaudio::audio('./audio/Intro.mp3')
 ```
 
 
-For the final presentation, I will be using the *Heart Disease UCI* dataset. This dataset is a tabular dataset. The dataset was found on the website *kaggle* at <https://www.kaggle.com/ronitf/heart-disease-uci/version/1>, but the set is from <https://archive.ics.uci.edu/ml/datasets/Heart+Disease>. The variables in the dataset that are of interest are:   
+For the final presentation, I will be using the *Heart Disease UCI* dataset for Exploratory Data Analysis. This dataset is a tabular dataset. The dataset was found on the website *kaggle* at <https://www.kaggle.com/ronitf/heart-disease-uci/version/1>, but the set is from <https://archive.ics.uci.edu/ml/datasets/Heart+Disease>. The variables in the dataset that are of interest are:   
     * AGE: numerical  
     * SEX: categorical  
     * RESTING BLOOD PRESSURE: numerical  

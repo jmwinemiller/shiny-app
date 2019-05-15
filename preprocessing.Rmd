@@ -1,4 +1,10 @@
-# Exploritory Data Analysis  
+# Exploratory Data Analysis  
+
+
+```{r audio-eda}
+shinyaudio::audio('./audio/Eda.mp3')
+```
+
 
 ```{r load-data}
 full.data = read.csv("./heart.csv", sep = ",", header = TRUE)
@@ -40,9 +46,16 @@ attach(df)
 ```
 
 
+```{r audio-pp}
+fluidPage(
+  titlePanel('Pre-processing Data')
+)
+shinyaudio::audio('./audio/preprocessing.mp3')
+```
+
+
 ```{r preprocessing-data}
 fluidPage(
-  titlePanel('Pre-processing Data'),
   mainPanel(
     h5('Reduced dataset compared to the full dataset.'),
     p('Changing the factors to non-encoded values for clean dataset.'),
@@ -63,9 +76,16 @@ output$fds <- renderDataTable(full.data, options = list(columnDefs = list(list(c
 ```
 
 
+```{r audio-sd}
+fluidPage(
+  titlePanel("Summarizing Data")
+)
+shinyaudio::audio('./audio/summary.mp3')
+```
+
+
 ```{r summary-data}
 fluidPage(
-  titlePanel("Summarizing Data"),
   mainPanel(
     h5("Creating Summary of data with the summarytools package."),
     tabsetPanel(
@@ -100,9 +120,16 @@ output$freq.rde <- renderUI({
 ```
 
 
+```{r audio-ct}
+fluidPage(
+  titlePanel("Examining Proportions")
+)
+shinyaudio::audio('./audio/proportion.mp3')
+```
+
+
 ```{r cross-tab}
 fluidPage(
-  titlePanel("Examining Proportions"),
   mainPanel(
     h5("Using cross-tabular tables to find row proportions of heart disease."),
     tabsetPanel(

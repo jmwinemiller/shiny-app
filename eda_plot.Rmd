@@ -1,6 +1,7 @@
 
+
 ```{r reload-data, include=F}
-full.data = read.csv("~/Documents/Personal/KU/STAT\ 806/presentation/heart.csv", sep = ",", header = TRUE)
+full.data = read.csv("./heart.csv", sep = ",", header = TRUE)
 h.full = head(full.data)
 rdf <- full.data %>% 
   select(1, 2, 4, 5, 8, 9, 3, 14) %>% 
@@ -38,6 +39,15 @@ h.df = head(df)
 attach(df)
 ```
 
+
+```{r audio-exp-vis}
+fluidPage(
+  titlePanel('Exploratory Visualations')
+)
+shinyaudio::audio('./audio/explore_vis.mp3')
+```
+
+
 ```{r visualization}
 library(summarytools)
 library(ggiraph)
@@ -67,7 +77,6 @@ fact.var = c('None', c.name[!(c.name %in% cont.var)])
 
 
 fluidPage(
-  titlePanel("Exploratory Visualizations"),
   sidebarLayout(
     sidebarPanel(
       selectInput(inputId = "x",
@@ -127,7 +136,7 @@ output$barSelection <- renderUI({
 
 output$boxSelection <- renderUI({
   conditionalPanel(
-    condition = "(['Sex', 'Resting Bp', 'Heart Rate', 'Exercise Induced Angina', 'Heart Disease'].includes(input.x) && input.y != 'Frequency') || (['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.x) && !['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.y))",
+    condition = "(['Sex', 'Chest Pain', 'Exercise Induced Angina', 'Heart Disease'].includes(input.x) && input.y != 'Frequency') || (['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.x) && !['Age', 'Rest Bp', 'Heart Rate', 'Cholestoral'].includes(input.y))",
     selectInput(inputId = 'box',
                 'Add Color for Variable:',
                 choices = fact.var)
@@ -198,3 +207,19 @@ output$plot <- renderggiraph({
 })
 ```
 
+
+# Setup
+
+```{r audio-setup}
+shinyaudio::audio('./audio/setup.mp3')
+```
+
+## Links  
+
+Link to the presentation @ <https://jwinemiller.shinyapps.io/Presentation/>  
+Link to the source code @ <https://github.com/jmwinemiller/shiny-app>  
+
+
+**New packages** not used in the course  
+Link to Data Tables <https://rstudio.github.io/DT/>  
+Link to ShinyAudio <https://rdrr.io/github/mattkcole/shinyaudio/man/audio.html>  
