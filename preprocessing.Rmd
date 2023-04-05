@@ -80,7 +80,7 @@ fluidPage(
 ```{r summary-data}
 fluidPage(
   mainPanel(
-    h5("Creating Summary of data with the summarytools package."),
+    h5("Creating summary of data with the summarytools package."),
     tabsetPanel(
       tabPanel("Data Frame Summary for Clean Data", htmlOutput("dfsum")),
       tabPanel("Descriptive Statistics for Clean Data", htmlOutput("des.stat")),

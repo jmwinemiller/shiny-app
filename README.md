@@ -9,4 +9,3 @@ NOTE: XQuartz is required to run the ggiraph package in rStudio. install instruc
 
 # Presentation
 The presentation with audio is hosted for viewing at <https://jwinemiller.shinyapps.io/Presentation/>
-

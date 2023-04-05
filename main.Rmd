@@ -6,7 +6,7 @@ date: "14 May 2019"
 output: 
   html_document:
     toc: yes
-    toc_depth: 4
+    toc_depth: 2 
     toc_float: yes
 runtime: shiny
 ---
@@ -70,7 +70,7 @@ output$packageList <- renderTable(required_packages, colnames=F, spacing = 'xs')
 ```
 
 
-## Links  
+# Links  
 
 Link to the presentation @ <https://jwinemiller.shinyapps.io/Presentation/>  
 Link to the source code @ <https://github.com/jmwinemiller/shiny-app>  

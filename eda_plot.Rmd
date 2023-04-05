@@ -42,7 +42,7 @@ attach(df)
 
 ```{r page-exp-vis}
 fluidPage(
-  titlePanel('Exploratory Visualations')
+  titlePanel('Exploratory Visualizations')
 )
 ```
 
