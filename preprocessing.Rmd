@@ -1,11 +1,6 @@
 # Exploratory Data Analysis  
 
 
-```{r audio-eda}
-shinyaudio::audio('./audio/Eda.mp3')
-```
-
-
 ```{r load-data}
 full.data = read.csv("./heart.csv", sep = ",", header = TRUE)
 h.full = head(full.data)
@@ -46,11 +41,10 @@ attach(df)
 ```
 
 
-```{r audio-pp}
+```{r page-pp}
 fluidPage(
   titlePanel('Pre-processing Data')
 )
-shinyaudio::audio('./audio/preprocessing.mp3')
 ```
 
 
@@ -76,11 +70,10 @@ output$fds <- renderDataTable(full.data, options = list(columnDefs = list(list(c
 ```
 
 
-```{r audio-sd}
+```{r page-sd}
 fluidPage(
   titlePanel("Summarizing Data")
 )
-shinyaudio::audio('./audio/summary.mp3')
 ```
 
 
@@ -120,11 +113,10 @@ output$freq.rde <- renderUI({
 ```
 
 
-```{r audio-ct}
+```{r page-ct}
 fluidPage(
   titlePanel("Examining Proportions")
 )
-shinyaudio::audio('./audio/proportion.mp3')
 ```
 
 

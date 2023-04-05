@@ -1,8 +1,8 @@
 ---
-title: "STAT 806 Presentation"
+title: "EDA Presentation"
 subtitle: "Heart Disease Among Factors of Health, Exercise induced angina, Heart Rates, and Demographic Information"
 author: "Jordan Winemiller"
-date: "`r format(Sys.time(), '%d %B %Y')`"
+date: "14 May 2019"
 output: 
   html_document:
     toc: yes
@@ -19,34 +19,25 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ip = installed.packages()[, 1]
 ip <- names(unlist(ip))
 
-required_packages = c('remotes', 'shiny', 'ggplot2', 'tidyverse', 'dplyr', 'summarytools', 'ggiraph', 'DT', 'cowplot')
-remote_packages = c('shinyaudio')
-all_packages = c(required_packages, remote_packages)
+required_packages = c(
+  'remotes',
+  'shiny',
+  'ggplot2',
+  'tidyverse',
+  'dplyr',
+  'summarytools',
+  'ggiraph',
+  'DT',
+  'cowplot')
 
-for (package in all_packages) {
-  if (package %in% ip) {
-    next
-  } else {
-    if (package %in% remote_packages) {
-      remotes::install_github('mattkcole/shinyaudio')
-    }
-    install.packages(package, repos = "http://cran.us.r-project.org")
-  }
-}
-
-lapply(all_packages, require, character.only = TRUE)
+lapply(required_packages, require, character.only = TRUE)
 ```
 
 
 # Presentation Overview  
 
 
-```{r audio-intro}
-shinyaudio::audio('./audio/Intro.mp3')
-```
-
-
-For the final presentation, I will be using the *Heart Disease UCI* dataset for Exploratory Data Analysis. This dataset is a tabular dataset. The dataset was found on the website *kaggle* at <https://www.kaggle.com/ronitf/heart-disease-uci/version/1>, but the set is from <https://archive.ics.uci.edu/ml/datasets/Heart+Disease>. The variables in the dataset that are of interest are:   
+For this presentation, I will be using the *Heart Disease UCI* dataset for Exploratory Data Analysis. This dataset is a tabular dataset. The dataset was found on the website *kaggle* at <https://www.kaggle.com/ronitf/heart-disease-uci/version/1>, but the set is from <https://archive.ics.uci.edu/ml/datasets/Heart+Disease>. The variables in the dataset that are of interest are:   
     * AGE: numerical  
     * SEX: categorical  
     * RESTING BLOOD PRESSURE: numerical  
@@ -55,7 +46,7 @@ For the final presentation, I will be using the *Heart Disease UCI* dataset for 
     * EXERCISE INCLUDED ANGINA: categorical  
     * CHEST PAIN: categorical  
     * HEART DISEASE: categorical  
-In addition, I will also go over how the presentation was setup using **rMarkdown**, **shinyApp**, and **embedded audio** with an example of downloading and loading required packages. The link to source code on *github* at <https://github.com/jmwinemiller/shiny-app>.  
+The link to source code on *github* at <https://github.com/jmwinemiller/shiny-app>.  
 
 
 ```{r}
@@ -67,7 +58,7 @@ fluidPage(
   ))
 )
 
-output$packageList <- renderTable(all_packages, colnames=F, spacing = 'xs')
+output$packageList <- renderTable(required_packages, colnames=F, spacing = 'xs')
 ```
 
 
@@ -79,4 +70,8 @@ output$packageList <- renderTable(all_packages, colnames=F, spacing = 'xs')
 ```
 
 
+## Links  
 
+Link to the presentation @ <https://jwinemiller.shinyapps.io/Presentation/>  
+Link to the source code @ <https://github.com/jmwinemiller/shiny-app>  
+Link to Data Tables <https://rstudio.github.io/DT/>  

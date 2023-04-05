@@ -40,11 +40,10 @@ attach(df)
 ```
 
 
-```{r audio-exp-vis}
+```{r page-exp-vis}
 fluidPage(
   titlePanel('Exploratory Visualations')
 )
-shinyaudio::audio('./audio/explore_vis.mp3')
 ```
 
 
@@ -206,20 +205,3 @@ output$plot <- renderggiraph({
   girafe(code = print(plt))
 })
 ```
-
-
-# Setup
-
-```{r audio-setup}
-shinyaudio::audio('./audio/setup.mp3')
-```
-
-## Links  
-
-Link to the presentation @ <https://jwinemiller.shinyapps.io/Presentation/>  
-Link to the source code @ <https://github.com/jmwinemiller/shiny-app>  
-
-
-**New packages** not used in the course  
-Link to Data Tables <https://rstudio.github.io/DT/>  
-Link to ShinyAudio <https://rdrr.io/github/mattkcole/shinyaudio/man/audio.html>  
